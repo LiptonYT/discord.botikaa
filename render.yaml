@@ -1,0 +1,21 @@
+services:
+  - type: worker
+    name: cpps-resignation-bot
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: GUILD_ID
+        value: "1533075462383730838"
+      - key: REVIEW_CHANNEL_ID
+        value: "1533076154783764663"
+      - key: TERMINATED_ROLE_ID
+        value: "1533075835097976893"
+      - key: REVIEWER_ROLE_IDS
+        value: "1533075692785504327"
+      - key: LOG_CHANNEL_ID
+        value: "0"
+      - key: DB_PATH
+        value: "terminations.sqlite3"
