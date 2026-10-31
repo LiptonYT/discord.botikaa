@@ -286,9 +286,11 @@ async def on_ready():
         if GUILD_ID:
             guild_obj = discord.Object(id=GUILD_ID)
             bot.tree.copy_global_to(guild=guild_obj)
-            await bot.tree.sync(guild=guild_obj)
+            synced = await bot.tree.sync(guild=guild_obj)
+            log.info("Синхронизировано команд для сервера %s: %s", GUILD_ID, [cmd.name for cmd in synced])
         else:
-            await bot.tree.sync()
+            synced = await bot.tree.sync()
+            log.info("Синхронизировано глобальных команд: %s", [cmd.name for cmd in synced])
     except Exception:
         log.exception("Slash command sync failed")
     log.info("Бот запущен как %s", bot.user)
@@ -296,8 +298,12 @@ async def on_ready():
 
 @bot.tree.command(name="setup_resignation", description="Create the resignation application panel")
 @app_commands.guild_only()
-@app_commands.default_permissions(administrator=True)
 async def resignation_panel(interaction: discord.Interaction):
+    if not isinstance(interaction.user, discord.Member) or not reviewer_allowed(interaction.user):
+        return await interaction.response.send_message(
+            "Эту панель может создавать только старший состав.",
+            ephemeral=True
+        )
     embed = discord.Embed(
         title="Расторжение контракта",
         description=(
